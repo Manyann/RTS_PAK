@@ -10,5 +10,7 @@ namespace Resource
         public static float ScrollSpeed { get { return 30; } }
         public static float MinCameraHeight { get { return 10; } }
         public static float MaxCameraHeight { get { return 40; } }
+        public static float RotateAmount { get { return 45; } }
+        public static float RotateSpeed { get { return 60; } }
     }
 }

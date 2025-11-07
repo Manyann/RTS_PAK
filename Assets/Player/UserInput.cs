@@ -15,6 +15,7 @@ public class UserInput : MonoBehaviour {
     // Update is called once per frame
     void Update () {
             MoveCamera();
+            RotateCamera();
     }
  
     private void MoveCamera() {
@@ -52,6 +53,20 @@ public class UserInput : MonoBehaviour {
  
         if(destination != origin) {
             Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
+        }
+    }
+
+    private void RotateCamera(){
+        Vector3 origin = Camera.main.transform.eulerAngles;
+        Vector3 destination = origin;
+        
+        if((Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) && Input.GetMouseButton(1)) {
+            destination.x -= Input.GetAxis("Mouse Y") * ResourceManager.RotateAmount;
+            destination.y += Input.GetAxis("Mouse X") * ResourceManager.RotateAmount;
+        }
+        
+        if(destination != origin) {
+            Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.RotateSpeed);
         }
     }
 }
