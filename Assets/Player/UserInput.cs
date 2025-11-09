@@ -18,47 +18,55 @@ public class UserInput : MonoBehaviour {
         RotateCamera();
     }
  
-    private void MoveCamera() {
+    private void MoveCamera()
+    {
         float positionX = Input.mousePosition.x;
         float positionY = Input.mousePosition.y;
-        Vector3 movement = new Vector3(0,0,0);
- 
-        // Horizontal
-        if(positionX >= 0 && positionX < ResourceManager.ScrollWidth) {
+        Vector3 movement = Vector3.zero;
+
+        if (positionX >= 0 && positionX < ResourceManager.ScrollWidth)
+        {
             movement.x -= ResourceManager.ScrollSpeed;
-        } else if(positionX <= Screen.width && positionX > Screen.width - ResourceManager.ScrollWidth) {
+        }
+        else if (positionX <= Screen.width && positionX > Screen.width - ResourceManager.ScrollWidth)
+        {
             movement.x += ResourceManager.ScrollSpeed;
         }
-        // Vertical
-        if(positionY >= 0 && positionY < ResourceManager.ScrollWidth) {
+
+        if (positionY >= 0 && positionY < ResourceManager.ScrollWidth)
+        {
             movement.z -= ResourceManager.ScrollSpeed;
-        } else if(positionY <= Screen.height && positionY > Screen.height - ResourceManager.ScrollWidth) {
+        }
+        else if (positionY <= Screen.height && positionY > Screen.height - ResourceManager.ScrollWidth)
+        {
             movement.z += ResourceManager.ScrollSpeed;
         }
- 
-        // Gestion du zoom
+
         movement = Camera.main.transform.TransformDirection(movement);
         movement.y = 0;
-        movement.y -= ResourceManager.ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
- 
-        // Affectation de la nouvelle position
+
         Vector3 origin = Camera.main.transform.position;
-        Vector3 destination = origin;
-        destination.x += movement.x;
-        destination.y += movement.y;
-        destination.z += movement.z;
- 
-        // Zoom dans les max ranges
-        if(destination.y > ResourceManager.MaxCameraHeight) {
-            destination.y = ResourceManager.MaxCameraHeight;
-        } else if(destination.y < ResourceManager.MinCameraHeight) {
-            destination.y = ResourceManager.MinCameraHeight;
+        Vector3 destination = origin + movement;
+
+        destination.y = Mathf.Clamp(destination.y, ResourceManager.MinCameraHeight, ResourceManager.MaxCameraHeight);
+
+        if (destination != origin)
+        {
+            Camera.main.transform.position = Vector3.MoveTowards(
+                origin,
+                destination,
+                Time.deltaTime * ResourceManager.ScrollSpeed
+            );
         }
 
-        if(destination != origin) {
-            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) > 0.01f)
+        {
+            float newSize = Camera.main.orthographicSize - scroll * ResourceManager.ScrollSpeed;
+            Camera.main.orthographicSize = Mathf.Clamp(newSize,ResourceManager.MinCameraHeight, ResourceManager.MaxCameraHeight);
         }
     }
+
 
     private void RotateCamera(){
         Vector3 origin = Camera.main.transform.eulerAngles;
